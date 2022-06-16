@@ -1,9 +1,11 @@
-
-
 public class PlayerScore {
     public String name, time;
     public int points;
-
+    
+    // TODO This code has no relation with the main program yet.
+    // Model cells in high score table with this class
+    // Be able to sort objects based on scores, and display them in order
+    
     public PlayerScore(String name, int points, String time) {
         this.name = name;
         this.points = points;

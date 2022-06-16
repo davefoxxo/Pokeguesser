@@ -17,17 +17,18 @@ public class Pokeguesser extends JFrame implements WindowListener {
         game.titleScreen();
     }
     
-    int points = 0;
     JPanel gamePanel = new JPanel();
     JPanel subPanel = new JPanel();
     JPanel buttonPanel = new JPanel();
     JLabel ptsText = new JLabel("Points: 0");
+
     Pokemon pk = new Pokemon(1);
     JLabel image = new JLabel();
     ImageIcon img = new ImageIcon();
+
     JLabel text = new JLabel();
     JTextField textField = new JTextField(20);
-    JButton btn = new JButton("Pass");
+    JButton nextButton = new JButton("Pass");
     JButton submitButton = new JButton("Submit");
     JButton hintButton = new JButton("Hint");
 
@@ -47,15 +48,11 @@ public class Pokeguesser extends JFrame implements WindowListener {
     JButton startButton = new JButton("Start");
     JPanel settingsPanel = new JPanel();
     JPanel subSettingsPanel = new JPanel();
-    JLabel rules = new JLabel("<html>Welcome to Pokeguesser!<br>Guess the Pokemon's name and move onto the next one.<br>If you can't think of the name, either get a hint or pass!<br>Select your time interval & difficulty, and press START!<br>5 points awarded per Pokemon guessed.<br><br><strong>Easy Mode:</strong> Smaller selection of the first 151 Pokemon. Great for teachers! ;)<br><strong>Normal Mode:</strong> All 898 Pokemon available!<br><strong>Hard mode:</strong> All 898 Pokemon, AND 1 point is deducted per hint and per pass. Also, no hint blanks will be filled for partially correct guesses!<br>You can use <strong>ENTER</strong> to submit answers. If you're correct, press <strong>ENTER</strong> again to go to the next Pokemon! To pass, press <strong>ENTER</strong> with an empty textbox.</html>");
 
     String[] times = {"30s", "1 min", "3 min", "Zen mode (unlimited)"};
     JComboBox<String> cb = new JComboBox<>(times);
-    boolean canGetPoints = true;
-    boolean hasStarted = false;
-    Timer timer = new Timer();
-    int sec = 0;
-    int difficulty = 0;// 0 easy, 1 normal, 2 hard
+    JLabel rules = new JLabel("<html>Welcome to Pokeguesser!<br>Guess the Pokemon's name and move onto the next one.<br>If you can't think of the name, either get a hint or pass!<br>Select your time interval & difficulty, and press START!<br>5 points awarded per Pokemon guessed.<br><br><strong>Easy Mode:</strong> Smaller selection of the first 151 Pokemon. Great for teachers! ;)<br><strong>Normal Mode:</strong> All 898 Pokemon available!<br><strong>Hard mode:</strong> All 898 Pokemon, AND 1 point is deducted per hint and per pass. Also, no hint blanks will be filled for partially correct guesses!<br>You can use <strong>ENTER</strong> to submit answers. If you're correct, press <strong>ENTER</strong> again to go to the next Pokemon! To pass, press <strong>ENTER</strong> with an empty textbox.</html>");
+
 
     JPanel highScorePanel = new JPanel();
     JButton highScoreButton = new JButton("High Scores");
@@ -67,14 +64,26 @@ public class Pokeguesser extends JFrame implements WindowListener {
 
     JPanel rbHiPanel = new JPanel();
     ButtonGroup hiGroup = new ButtonGroup();
+
     JPanel highScoreTitlePanel = new JPanel();
-
     JPanel highScoreTable = new JPanel();
-
     JPanel highScoreBackPanel = new JPanel();
     JButton highScoreBack = new JButton("Back");
 
     JLabel name, pts, time;
+
+    int points = 0;
+    int sec = 0;
+    int difficulty = 0;// 0 easy, 1 normal, 2 hard
+
+    BufferedReader reader;
+    BufferedWriter writer;
+    File file;
+
+    boolean canGetPoints = true;
+    boolean hasStarted = false;
+    Timer timer = new Timer();
+    StringBuilder sb = new StringBuilder();
 
     final Font ARIAL24 = new Font("Arial", Font.PLAIN, 24);
     final Font ARIAL20 = new Font("Arial", Font.PLAIN, 20);
@@ -86,9 +95,6 @@ public class Pokeguesser extends JFrame implements WindowListener {
     final Color DARK_SPACE_GRAY = new Color(29, 28, 32);
     final Color BRIGHT_RED = new Color(255,44,44);
 
-    BufferedReader reader;
-    BufferedWriter writer;
-    File file;
 
     public void titleScreen() {
         titlePanel.removeAll();
@@ -284,7 +290,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
         setContentPane(gamePanel);
         
         GridBagLayout gb = new GridBagLayout();
-        gamePanel.setLayout(gb);
+        gamePanel.setLayout(gb);    
         GridBagConstraints con = new GridBagConstraints();
 
         if(!cb.getSelectedItem().toString().equals("Zen mode (unlimited)")) {
@@ -317,8 +323,6 @@ public class Pokeguesser extends JFrame implements WindowListener {
 
                         String name = JOptionPane.showInputDialog(gamePanel, "Points: " + points + "\nPlease enter your name:", "Time's up!", JOptionPane.INFORMATION_MESSAGE);
                         
-                        System.out.println(name);
-
                         file = new File(String.format("HISCORES\\%d.txt", difficulty));
                         if(name != null) {
                             try {
@@ -366,14 +370,11 @@ public class Pokeguesser extends JFrame implements WindowListener {
 
         // Colour of border changes depending on what difficulty you're playing on
         MatteBorder toSet = BorderFactory.createMatteBorder(10, 10, 10, 10, Color.BLACK);
-        if(difficulty == 0) {
-            toSet = BorderFactory.createMatteBorder(10, 10, 10, 10, Color.GREEN);
-        } else if (difficulty == 1) {
-            toSet = BorderFactory.createMatteBorder(10, 10, 10, 10, Color.WHITE);
-        } else if(difficulty == 2) {
-            toSet = BorderFactory.createMatteBorder(10, 10, 10, 10, BRIGHT_RED);
+
+        if(difficulty == 0) toSet = BorderFactory.createMatteBorder(10, 10, 10, 10, Color.GREEN);
+        else if (difficulty == 1) toSet = BorderFactory.createMatteBorder(10, 10, 10, 10, Color.WHITE);
+        else if(difficulty == 2) toSet = BorderFactory.createMatteBorder(10, 10, 10, 10, BRIGHT_RED);
             
-        }
         subPanel.setBorder(BorderFactory.createCompoundBorder(toSet, BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 
         buttonPanel.setLayout(new GridLayout(1,3,10,0));
@@ -395,7 +396,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
         image.setHorizontalAlignment(JLabel.CENTER);
         image.setSize(256,256);
 
-        StringBuilder sb = new StringBuilder();
+        sb = new StringBuilder();
         for(int i = 0; i < pk.name.length(); i++) {
             sb.append("_ ");
         }
@@ -423,18 +424,17 @@ public class Pokeguesser extends JFrame implements WindowListener {
         subPanel.setBackground(new Color(54, 52, 59));
 
         
-        btn.setPreferredSize(new Dimension(200,32));
-        btn.addActionListener(new ButtonListener());
-        btn.setToolTipText("Generate a new Pokemon!");
-        btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-        btn.setFont(ARIAL20);
+        nextButton.setPreferredSize(new Dimension(200,32));
+        nextButton.addActionListener(new ButtonListener());
+        nextButton.setToolTipText("Generate a new Pokemon!");
+        nextButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        nextButton.setFont(ARIAL20);
 
         
         submitButton.setPreferredSize(new Dimension(200,32));
         submitButton.addActionListener(new ButtonListener());
         submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         submitButton.setFont(ARIAL20);
-
         textField.setText(null);
         
         textField.setPreferredSize(new Dimension(32,16));
@@ -450,7 +450,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
         buttonPanel.setBackground(new Color(54, 52, 59));
         buttonPanel.add(hintButton);
         buttonPanel.add(submitButton);
-        buttonPanel.add(btn);
+        buttonPanel.add(nextButton);
 
         subPanel.add(textField);
         subPanel.add(buttonPanel);
@@ -475,12 +475,12 @@ public class Pokeguesser extends JFrame implements WindowListener {
     public class ButtonListener implements ActionListener {
         @Override
         public void actionPerformed(java.awt.event.ActionEvent event) {
-            if(event.getSource() == btn || 
+            if(event.getSource() == nextButton || 
               (event.getSource() == textField && (!canGetPoints || textField.getText().length() == 0))) {
                 if(points > 0 && canGetPoints && difficulty == 2) points -= 1;
                 ptsText.setText("Points: " + points + " | Time Left: " + sec);
                 canGetPoints = true;
-                btn.setText("Pass");
+                nextButton.setText("Pass");
 
                 // New random Pokemon
                 pk = new Pokemon(difficulty);
@@ -498,7 +498,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
                 img = new ImageIcon(mon);
                 image.setIcon(img);
                 
-                StringBuilder sb = new StringBuilder();
+                sb = new StringBuilder();
                 for(int i = 0; i < pk.name.length(); i++) {
                     sb.append("_ ");
                 }
@@ -515,7 +515,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
                         points += 5;
                         ptsText.setText("Points: " + points + " | Time Left: " + sec);
                         canGetPoints = false;
-                        btn.setText("NEXT");
+                        nextButton.setText("NEXT");
                     }
 
                     playAudio(new File("right.wav"));
@@ -525,7 +525,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
                     playAudio(new File("wrong.wav"));
 
                     if(difficulty != 2) {
-                        StringBuilder sb = new StringBuilder();
+                        sb = new StringBuilder();
                         for(int i = 0; i < pk.name.length(); i++) {
                             try {
                                 if(textField.getText().toLowerCase().charAt(i) == pk.name.toLowerCase().charAt(i)) {
@@ -541,7 +541,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
 
                         text.setText(sb.toString());
                     } else {
-                        StringBuilder sb = new StringBuilder();
+                        sb = new StringBuilder();
                         for(int i = 0; i < pk.name.length(); i++) {
                             sb.append("_ ");
                         }
@@ -555,7 +555,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
                 if(points > 0 && difficulty == 2) points -= 1;
                 ptsText.setText("Points: " + points + " | Time Left: " + sec);
 
-                StringBuilder sb = new StringBuilder();
+                sb = new StringBuilder();
                 sb.append(pk.name.toCharArray()[0]);
                 sb.append(" ");
 
@@ -564,7 +564,6 @@ public class Pokeguesser extends JFrame implements WindowListener {
                 }
 
                 sb.append(pk.name.toCharArray()[pk.name.length()-1]);
-
                 text.setText(sb.toString());
             }
 
@@ -581,7 +580,6 @@ public class Pokeguesser extends JFrame implements WindowListener {
             else if(event.getSource() == highScoreButton) {
                 highScoreScreen(1);
                 rbHiNormal.setSelected(true);
-
             }
 
             else if(event.getSource() == rbHiEasy) {
