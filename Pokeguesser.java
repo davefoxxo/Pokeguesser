@@ -284,7 +284,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
         setContentPane(gamePanel);
         
         GridBagLayout gb = new GridBagLayout();
-        gamePanel.setLayout(gb);
+        gamePanel.setLayout(gb);    
         GridBagConstraints con = new GridBagConstraints();
 
         if(!cb.getSelectedItem().toString().equals("Zen mode (unlimited)")) {

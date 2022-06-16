@@ -1,5 +1,3 @@
-
-
 public class PlayerScore {
     public String name, time;
     public int points;
