@@ -9,7 +9,9 @@ import java.io.*;
 import java.awt.Font;
 import java.awt.event.*;
 import java.util.Timer;
-import java.util.TimerTask;
+import java.util.TimerTask
+
+// TODO ADD MORE COMMENTS LOL
 
 public class Pokeguesser extends JFrame implements WindowListener {
     public static void main(String[] args) {
