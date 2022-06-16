@@ -74,7 +74,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
 
     int points = 0;
     int sec = 0;
-    int difficulty = 0;// 0 easy, 1 normal, 2 hard
+    int difficulty = 0; // 0 easy, 1 normal, 2 hard
 
     BufferedReader reader;
     BufferedWriter writer;
