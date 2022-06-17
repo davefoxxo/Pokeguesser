@@ -4,10 +4,11 @@ import java.awt.*;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 
-import java.io.File;
 import java.io.*;
 import java.awt.Font;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -214,12 +215,33 @@ public class Pokeguesser extends JFrame implements WindowListener {
 
         file = new File(String.format("HISCORES\\%d.txt", _dif));
 
+        ArrayList<ArrayList<String>> allPlayers = new ArrayList<>();
 
         try {
+            // High score table with display the 10 MOST RECENT names, scores, and times for each of the 3 difficulties.
             reader = new BufferedReader(new FileReader(file));
+
             String line = reader.readLine();
             String[] data;
 
+            // Read all the data, and store it in an ArrayList which holds ArrayLists that hold names, scores, times.
+            while(line != null) {
+                ArrayList<String> temp = new ArrayList<>();
+                data = line.split(";");
+
+                temp.add(data[0]);
+                temp.add(data[1]);
+                temp.add(data[2]);
+
+                allPlayers.add(temp);
+                line = reader.readLine();
+            }
+
+            // Reverse the list so that calling indexes 0 to 9 means the 10 most recent scores
+            // Since new lines in a file are written at the bottom
+            Collections.reverse(allPlayers);
+
+            // Creating and styling JLabels on the top row of the table (they label the columns)
             JLabel nameTop = new JLabel("NAME");
             JLabel pointsTop = new JLabel("SCORE");
             JLabel timeTop = new JLabel("TIME");
@@ -233,25 +255,30 @@ public class Pokeguesser extends JFrame implements WindowListener {
                 highScoreTable.add(lbl);
             }
 
-            int x = 0;
-            while(x < 10) {
+            // Loop that goes from 0-9, taking the most recent
+            for(int x = 0; x < 10; x++) {
+                // Reset the labels after each loop
                 name = new JLabel("-");
                 pts = new JLabel("-");
                 time = new JLabel("-");
 
-                final JLabel[] ROW = {name, pts, time};
-
-                if(line != null) {
-                    data = line.split(";");
-
-                    name.setText(data[0]);
-                    pts.setText(data[1]);
-                    time.setText(data[2]);
+                try {
+                    // Set each row to be a player's name, score, and time
+                    // ArrayList that holds ArrayLists that holds the name, points, and time of a player in that order
+                    name.setText(allPlayers.get(x).get(0));
+                    pts.setText(allPlayers.get(x).get(1));
+                    time.setText(allPlayers.get(x).get(2));
+                } catch(IndexOutOfBoundsException e) { 
+                    // In the case that there's not yet 10 attemps in a difficulty, put placeholder "-" dashes
+                    // (this is already declared above)
                 }
-
+                    
+                // Setting all the styles of the rows
                 name.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(3, 6, 3, 0, DARK_SPACE_GRAY), BorderFactory.createEmptyBorder(10,10,10,10)));
                 pts.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(3, 6, 3, 6, DARK_SPACE_GRAY), BorderFactory.createEmptyBorder(10,10,10,10)));
                 time.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createMatteBorder(3, 0, 3, 6, DARK_SPACE_GRAY), BorderFactory.createEmptyBorder(10,10,10,10)));
+
+                final JLabel[] ROW = {name, pts, time};
 
                 for(JLabel row : ROW) {
                     row.setFont(ARIAL24);
@@ -260,9 +287,8 @@ public class Pokeguesser extends JFrame implements WindowListener {
                     row.setForeground(Color.BLACK);
                     highScoreTable.add(row);
                 }
+                
 
-                line = reader.readLine();
-                x++;
             }
             reader.close();
 

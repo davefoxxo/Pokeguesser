@@ -1,5 +1,0 @@
-david;75;1 min;
-david;15;30s;
-David;170;3 min;
-david;45;30s;
-Dave;85;1 min;
