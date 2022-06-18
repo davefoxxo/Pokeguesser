@@ -2,6 +2,7 @@ import java.net.*;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -930,7 +931,8 @@ public class Pokemon {
             ImageIO.write(image, "png", new File("mon.png"));
 
         } catch(IOException e){
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "You don't appear to be connected to the Internet. \nPlease connect and try again later!", "No Internet Connection", JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
         } 
     }
 }
