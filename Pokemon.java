@@ -10,18 +10,16 @@ import java.io.IOException;
 
 
 public class Pokemon {
-    
+    public String name;
+    public int dex;
+    private int difficulty, x, gen;
 
-    String name;
-    int dex;
-    int difficulty;
 
     public Pokemon(int difficulty) {
-        int gen = new Random().nextInt(898) + 1;
-
-        if(difficulty == 0) gen = new Random().nextInt(151) + 1;
-
-
+        if(difficulty == 0) x = 151;
+        else x = 898
+            
+        int gen = new Random().nextInt(x) + 1;       
         this.name = POKEMON[gen-1];
         this.dex = gen;
     }
