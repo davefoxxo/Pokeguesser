@@ -361,28 +361,26 @@ public class Pokeguesser extends JFrame implements WindowListener {
                         // Prompt user to enter name
                         String name = JOptionPane.showInputDialog(gamePanel, "Points: " + points + "\nPlease enter your name:", "Time's up!", JOptionPane.INFORMATION_MESSAGE);
 
-                        // Write name, points, and time to file, unless name is blank
-                        if(name != null && !name.isEmpty()) {
-                            try {
-                                file = new File(String.format("HISCORES\\%d.txt", difficulty));
-                                writer = new BufferedWriter(new FileWriter(file, true));
+                        // If person didn't enter a name, default to "Player"
+                        if(name == null || name.isEmpty()) name = "Player";
 
-                                // Split character is a semicolon
-                                writer.write(name);
-                                writer.write(';');
-                                writer.write(String.valueOf(points));
-                                writer.write(';');
-                                writer.write(selection);
-                                writer.write(';');
-                                writer.newLine();
+                        try {
+                            file = new File(String.format("HISCORES\\%d.txt", difficulty));
+                            writer = new BufferedWriter(new FileWriter(file, true));
 
-                                writer.close();
+                            // Split character is a semicolon
+                            writer.write(name);
+                            writer.write(';');
+                            writer.write(String.valueOf(points));
+                            writer.write(';');
+                            writer.write(selection);
+                            writer.write(';');
+                            writer.newLine();
 
-                            } catch(IOException e) {
-                                System.err.println(e);
-                            }
-                        }
+                            writer.close();
 
+                        } catch(IOException e) {}
+                        
                         // Prompt user if they want to play again or not
                         int yn = JOptionPane.showConfirmDialog(gamePanel,"Play again?", "Time's up!", JOptionPane.INFORMATION_MESSAGE);
                         
