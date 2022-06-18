@@ -10,9 +10,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Timer;
-import java.util.TimerTask
-
-// TODO ADD MORE COMMENTS LOL
+import java.util.TimerTask;
 
 public class Pokeguesser extends JFrame implements WindowListener {
     public static void main(String[] args) {
@@ -52,10 +50,9 @@ public class Pokeguesser extends JFrame implements WindowListener {
     JPanel settingsPanel = new JPanel();
     JPanel subSettingsPanel = new JPanel();
 
-    String[] times = {"30s", "1 min", "3 min", "Zen mode (unlimited)"};
+    String[] times = {"30s", "1 min", "3 min", "5 min", "Zen mode (unlimited)"};
     JComboBox<String> cb = new JComboBox<>(times);
     JLabel rules = new JLabel("<html>Welcome to Pokeguesser!<br>Guess the Pokemon's name and move onto the next one.<br>If you can't think of the name, either get a hint or pass!<br>Select your time interval & difficulty, and press START!<br>5 points awarded per Pokemon guessed.<br><br><strong>Easy Mode:</strong> Smaller selection of the first 151 Pokemon. Great for teachers! ;)<br><strong>Normal Mode:</strong> All 898 Pokemon available!<br><strong>Hard mode:</strong> All 898 Pokemon, AND 1 point is deducted per hint and per pass. Also, no hint blanks will be filled for partially correct guesses!<br>You can use <strong>ENTER</strong> to submit answers. If you're correct, press <strong>ENTER</strong> again to go to the next Pokemon! To pass, press <strong>ENTER</strong> with an empty textbox.</html>");
-
 
     JPanel highScorePanel = new JPanel();
     JButton highScoreButton = new JButton("High Scores");
@@ -158,6 +155,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
         subSettingsPanel.add(timeLabel);
 
         cb.setFont(ARIAL18_BOLD);
+        cb.setSelectedIndex(1);
         subSettingsPanel.add(cb);
 
         difLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -313,7 +311,8 @@ public class Pokeguesser extends JFrame implements WindowListener {
 
 
     public void gameScreen() {
-        sec = 0;
+        // Game Screen initialization
+        sec = 0; // Keeps track of time
         gamePanel.removeAll();
         setContentPane(gamePanel);
         
@@ -321,41 +320,54 @@ public class Pokeguesser extends JFrame implements WindowListener {
         gamePanel.setLayout(gb);    
         GridBagConstraints con = new GridBagConstraints();
 
+        // Ignore this entire block if the user selected zen mode (then we don't worry about timers)
         if(!cb.getSelectedItem().toString().equals("Zen mode (unlimited)")) {
             timer = new Timer();
-            String selection = cb.getSelectedItem().toString();
 
+            // Get the time the user selected
+            String selection = cb.getSelectedItem().toString();
+            
+            // Set the initial time keeping variable to the appropriate selection
+            // (2 more seconds because I noticed it usually takes ~2 seconds for the panel to load)
             if(selection.equals("30s")) sec = 32;
             else if(selection.equals("1 min")) sec = 62;
             else if(selection.equals("3 min")) sec = 182;
+            else if(selection.equals("5 min")) sec = 302;
 
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
+                    // Every time the clock ticks:
+                    // Update the timer text at the top of the screen
                     ptsText.setText("Points: " + points + " | Time Left: " + sec);
                     sec--;
 
+                    // If below 10 seconds are remaining, flash the text red and white, changing every second
                     if(sec < 10 && sec % 2 == 1) {
                         ptsText.setForeground(BRIGHT_RED);
                     } else if(sec < 10 && sec % 2 == 0) {
                         ptsText.setForeground(Color.WHITE);
                     }   
 
+                    // At 10 seconds remaining, play a "time's running out" sound
                     if(sec == 9) playAudio(new File("tick.wav"));
 
                     if (sec < 0) {
+                        // Cancel timer, and play game over audio.
                         timer.cancel();
                         sec = -1;
-                        
                         playAudio(new File("over.wav"));
 
+                        // Prompt user to enter name
                         String name = JOptionPane.showInputDialog(gamePanel, "Points: " + points + "\nPlease enter your name:", "Time's up!", JOptionPane.INFORMATION_MESSAGE);
-                        
-                        file = new File(String.format("HISCORES\\%d.txt", difficulty));
-                        if(name != null) {
+
+                        // Write name, points, and time to file, unless name is blank
+                        if(name != null && !name.isEmpty()) {
                             try {
+                                file = new File(String.format("HISCORES\\%d.txt", difficulty));
                                 writer = new BufferedWriter(new FileWriter(file, true));
 
+                                // Split character is a semicolon
                                 writer.write(name);
                                 writer.write(';');
                                 writer.write(String.valueOf(points));
@@ -371,15 +383,17 @@ public class Pokeguesser extends JFrame implements WindowListener {
                             }
                         }
 
+                        // Prompt user if they want to play again or not
                         int yn = JOptionPane.showConfirmDialog(gamePanel,"Play again?", "Time's up!", JOptionPane.INFORMATION_MESSAGE);
-
-
+                        
+                        // Yes button takes back to title screen
                         if(yn == 0 || yn == 2) {
                             canGetPoints = true;
                             points = 0;
                             hasStarted = false;
                             titleScreen();
-
+                        
+                        // No button exits the program.
                         } else if(yn == 1) {
                             System.exit(0);
                         }
@@ -391,91 +405,108 @@ public class Pokeguesser extends JFrame implements WindowListener {
         gamePanel.setBackground(SPACE_GRAY);
         gamePanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
+        // Text at the top of the screen
         ptsText.setText("Points: " + points + " | Time Left: " + sec);
         ptsText.setForeground(Color.WHITE);
 
+        // The panel at the bottom which houses the _ _ _ _ text, textfield, and 3 buttons has a grid layout
         subPanel.setLayout(new GridLayout(3, 1, 50, 20));
 
         // Colour of border changes depending on what difficulty you're playing on
-        MatteBorder toSet = BorderFactory.createMatteBorder(10, 10, 10, 10, Color.BLACK);
+        MatteBorder toSet = BorderFactory.createMatteBorder(10, 10, 10, 10, Color.BLACK);   
 
-        if(difficulty == 0) toSet = BorderFactory.createMatteBorder(10, 10, 10, 10, Color.GREEN);
+        // Green = easy, White = normal, Red = hard
+        if(difficulty == 0) toSet = BorderFactory.createMatteBorder(10, 10, 10, 10, new Color(100, 208, 152));
         else if (difficulty == 1) toSet = BorderFactory.createMatteBorder(10, 10, 10, 10, Color.WHITE);
         else if(difficulty == 2) toSet = BorderFactory.createMatteBorder(10, 10, 10, 10, BRIGHT_RED);
             
         subPanel.setBorder(BorderFactory.createCompoundBorder(toSet, BorderFactory.createEmptyBorder(10, 10, 10, 10)));
 
-        buttonPanel.setLayout(new GridLayout(1,3,10,0));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        buttonPanel.setBackground(DARK_SPACE_GRAY);
 
+        // Generate new Pokemon (difficulty is passed because in the case of easy more, less Pokemon to choose from)
         pk = new Pokemon(difficulty);
+        // Download an image of this new Pokemon
         pk.getImage();
 
+        // Set the main image to the Pokemon image we just downloaded
         Image mon = null;
         try {
             mon = ImageIO.read(new File("mon.png"));
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
+        } catch(IOException e) {}
+
         img = new ImageIcon(new ImageIcon(mon).getImage().getScaledInstance(480, 480, java.awt.Image.SCALE_SMOOTH));
 
         image.setIcon(img);
         image.setHorizontalAlignment(JLabel.CENTER);
         image.setSize(256,256);
 
+        // Set the default text in the UI (A bunch of underscores depending on the Pokemon's name's length)
         sb = new StringBuilder();
-        for(int i = 0; i < pk.name.length(); i++) {
-            sb.append("_ ");
-        }
+        for(int i = 0; i < pk.name.length(); i++) sb.append("_ ");
         text.setText(sb.toString());
-
+        
+        // Style the text
         text.setFont(new Font("Arial", Font.PLAIN, 50));
         text.setForeground(new Color(255,255,255));
         text.setHorizontalAlignment(JLabel.CENTER);
 
+        // GridBag Layout shenanegans
         con.fill = GridBagConstraints.BOTH;
         con.gridwidth = GridBagConstraints.REMAINDER;
-
         con.gridheight = 1;
+        
+        // Style the top text
         ptsText.setFont(new Font("Arial", Font.PLAIN, 40));
         ptsText.setHorizontalAlignment(JLabel.CENTER);
+
+        // Update constraints to GridBag and add the top text to the panel
         gb.setConstraints(ptsText, con);
         gamePanel.add(ptsText);
 
+        // Update constraints again and then add the image to the panel 
+        // (which is below the top text, and takes up most of the panel)
         con.gridheight = 2;
         con.weighty = 1.0;
         gb.setConstraints(image, con);
-    
         gamePanel.add(image);
+        
         subPanel.add(text);
         subPanel.setBackground(new Color(54, 52, 59));
 
+        // Button panel will be a 1x3 grid for all 3 buttons at the very bottom of the parent grid
+        buttonPanel.setLayout(new GridLayout(1,3,10,0));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        buttonPanel.setBackground(DARK_SPACE_GRAY);
         
+        // Rightmost next button styles
         nextButton.setPreferredSize(new Dimension(200,32));
         nextButton.addActionListener(new ButtonListener());
         nextButton.setToolTipText("Generate a new Pokemon!");
         nextButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         nextButton.setFont(ARIAL20);
 
-        
+        // Middle submit button styles
         submitButton.setPreferredSize(new Dimension(200,32));
         submitButton.addActionListener(new ButtonListener());
         submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         submitButton.setFont(ARIAL20);
-        textField.setText(null);
-        
-        textField.setPreferredSize(new Dimension(32,16));
-        textField.setFont(new Font("Arial", Font.PLAIN, 32));
-        textField.setHorizontalAlignment(JTextField.CENTER);
-        if(textField.getActionListeners().length == 0) textField.addActionListener(new ButtonListener());
 
+        // Leftmost hit button styles
         hintButton.setPreferredSize(new Dimension(200, 32));
         hintButton.addActionListener(new ButtonListener());
         hintButton.setFont(ARIAL20);
         hintButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        buttonPanel.setBackground(new Color(54, 52, 59));
+        // Textfield styles, setting default text to nothing
+        textField.setText(null);
+        textField.setPreferredSize(new Dimension(32,16));
+        textField.setFont(new Font("Arial", Font.PLAIN, 32));
+        textField.setHorizontalAlignment(JTextField.CENTER);
+        // Weird bug was happening where the textfield would get multiple actionlisteners, lagging the program
+        // So only add an actionlistener if there isn't one already
+        if(textField.getActionListeners().length == 0) textField.addActionListener(new ButtonListener());
+
+        // Add the buttons, and everything else to the gamePanel
         buttonPanel.add(hintButton);
         buttonPanel.add(submitButton);
         buttonPanel.add(nextButton);
@@ -488,6 +519,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
     }
 
     public Pokeguesser() {
+        // JFrame boilerplate code
         setContentPane(titlePanel);
         setTitle("Pokeguesser");
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -503,9 +535,17 @@ public class Pokeguesser extends JFrame implements WindowListener {
     public class ButtonListener implements ActionListener {
         @Override
         public void actionPerformed(java.awt.event.ActionEvent event) {
-            if(event.getSource() == nextButton || 
-              (event.getSource() == textField && (!canGetPoints || textField.getText().length() == 0))) {
+            
+            // Next Pokemon
+            if(event.getSource() == nextButton || // Activated Clicking actual button...
+              (event.getSource() == textField && (!canGetPoints || textField.getText().length() == 0))) { 
+                // Or Pressing enter when textfield is focused, and is empty
+                // When player presses enter on an empty field, assume they are SKIPPING
+                
+                // Remove points only if player can lose points and is playing hard mode
                 if(points > 0 && canGetPoints && difficulty == 2) points -= 1;
+
+                // Update text with the points
                 ptsText.setText("Points: " + points + " | Time Left: " + sec);
                 canGetPoints = true;
                 nextButton.setText("Pass");
@@ -518,57 +558,76 @@ public class Pokeguesser extends JFrame implements WindowListener {
                 Image mon = null;
                 try {
                     mon = ImageIO.read(new File("mon.png"));
-                } catch(IOException e) {
-                    e.printStackTrace();
-                }
+                } catch(IOException e) {}
 
                 // Update text and image
                 img = new ImageIcon(mon);
                 image.setIcon(img);
                 
+                // Make a new string of empty _ based on Pokemon's name's length
                 sb = new StringBuilder();
                 for(int i = 0; i < pk.name.length(); i++) {
                     sb.append("_ ");
                 }
 
+                // Update text
                 text.setText(sb.toString());
                 textField.setText("");
 
             }
 
-            else if((event.getSource() == submitButton && textField.getText() != "") || (event.getSource() == textField && canGetPoints)) {
+            // Player guess
+            else if((event.getSource() == submitButton && textField.getText() != "") || // Activated on clicking submit button...
+                    (event.getSource() == textField && canGetPoints)) { // Or pressing enter when focusing on textfield, and there's actually a guess in the text field
+
+                // If the guess is correct (compare to Pokemon name instance variable)
                 if(textField.getText().toLowerCase().equals(pk.name.toLowerCase())) {
+                    // Update text to the name of the Pokemon
                     text.setText("You got it! " + pk.name);
+
+                    // Add 5 points to the player's score
+                    // If block here because no points should be awarded if the player presses Enter just like that
                     if(canGetPoints) {
                         points += 5;
                         ptsText.setText("Points: " + points + " | Time Left: " + sec);
-                        canGetPoints = false;
+                        canGetPoints = false; // Set can get points to false so that player can't spam enter for infinite points
                         nextButton.setText("NEXT");
                     }
 
+                    // Play correct audio!
                     playAudio(new File("right.wav"));
 
                 } else {
                     
+                    // Play incorrect audio
                     playAudio(new File("wrong.wav"));
 
+                    // If playing on easy or normal diffuculty,
+                    // The player gets a hint
                     if(difficulty != 2) {
                         sb = new StringBuilder();
+
+                        // Build a new string, going char by char of the players guess and the actual Pokemon's name.
+                        // If a char matches, add that correct char to the string. Otherwise, put an _.
+                        // For example, if the actual name is PIKACHU and the guess is PEKACHU
+                        // Set the text to P _ K A C H U
                         for(int i = 0; i < pk.name.length(); i++) {
                             try {
                                 if(textField.getText().toLowerCase().charAt(i) == pk.name.toLowerCase().charAt(i)) {
-                                    sb.append(pk.name.charAt(i) + " ");
+                                    sb.append(pk.name.charAt(i) + " "); // Correct char at this index
                                 } else {
-                                    sb.append("_ ");
+                                    sb.append("_ "); // Incorrect char at this index
                                 }
-                            }  catch(IndexOutOfBoundsException e) {
+                            }  catch(IndexOutOfBoundsException e) { // In case guess is longer or shorter than the actual name
                                 sb.append("_ ");
-
                             }
                         }
 
                         text.setText(sb.toString());
+
+                    // If playing on hard mode, player does not get a hint.
                     } else {
+                        // Just put underscores.
                         sb = new StringBuilder();
                         for(int i = 0; i < pk.name.length(); i++) {
                             sb.append("_ ");
