@@ -348,13 +348,13 @@ public class Pokeguesser extends JFrame implements WindowListener {
                     }   
 
                     // At 10 seconds remaining, play a "time's running out" sound
-                    if(sec == 9) playAudio(new File("tick.wav"));
+                    if(sec == 9) playAudio(new File("Media\\tick.wav"));
 
                     if (sec < 0) {
                         // Cancel timer, and play game over audio.
                         timer.cancel();
                         sec = -1;
-                        playAudio(new File("over.wav"));
+                        playAudio(new File("Media\\over.wav"));
 
                         // Prompt user to enter name
                         String name = JOptionPane.showInputDialog(gamePanel, "Points: " + points + "\nPlease enter your name:", "Time's up!", JOptionPane.INFORMATION_MESSAGE);
@@ -591,12 +591,12 @@ public class Pokeguesser extends JFrame implements WindowListener {
                     }
 
                     // Play correct audio!
-                    playAudio(new File("right.wav"));
+                    playAudio(new File("Media\\right.wav"));
 
                 } else {
                     
                     // Play incorrect audio
-                    playAudio(new File("wrong.wav"));
+                    playAudio(new File("Media\\wrong.wav"));
 
                     // If playing on easy or normal diffuculty,
                     // The player gets a hint
