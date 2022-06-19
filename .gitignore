@@ -27,3 +27,6 @@ hs_err_pid*
 
 # text files that just keep track of highscores
 HISCORES/
+
+# image file for the Pokemon
+*.png
