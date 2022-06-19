@@ -292,9 +292,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
             }
             reader.close();
 
-        } catch(IOException e) {
-            System.err.print(e);
-        }
+        } catch(IOException e) {}
 
         highScorePanel.add(highScoreTable, BorderLayout.CENTER);
         

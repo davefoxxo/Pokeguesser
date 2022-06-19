@@ -12,14 +12,14 @@ import java.io.IOException;
 public class Pokemon {
     public String name;
     public int dex;
-    private int x, gen;
+    private int maxMon, gen;
 
 
     public Pokemon(int difficulty) {
-        if(difficulty == 0) x = 151;
-        else x = 898;
+        if(difficulty == 0) maxMon = 151;
+        else maxMon = 898;
             
-        gen = new Random().nextInt(x) + 1;       
+        gen = new Random().nextInt(maxMon) + 1;   
         this.name = POKEMON[gen-1];
         this.dex = gen;
     }
@@ -706,7 +706,7 @@ public class Pokemon {
         "Vivillon",
         "Litleo",
         "Pyroar",
-        "Flabébé",
+        "Flabebe",
         "Floette",
         "Florges",
         "Skiddo",
