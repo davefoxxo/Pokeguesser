@@ -801,6 +801,7 @@ public class Pokeguesser extends JFrame implements WindowListener {
     public void windowIconified(WindowEvent e) {}
 
     // This method will play a file given a file name
+    // Taken from online
     public void playAudio(File file) {
         try {        
             AudioInputStream stream = AudioSystem.getAudioInputStream(file);
