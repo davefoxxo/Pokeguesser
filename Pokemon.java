@@ -16,27 +16,33 @@ public class Pokemon {
 
 
     public Pokemon(int difficulty) {
+        // Easy mode: only the first 151 Pokemon
         if(difficulty == 0) maxMon = 151;
+        // Otherwise include all 898 Pokemon
         else maxMon = 898;
-            
+        
+        // Generate a random number
         gen = new Random().nextInt(maxMon) + 1;   
-        this.name = POKEMON[gen-1];
-        this.dex = gen;
+        this.name = POKEMON[gen-1]; // Get the appropriate name
+        this.dex = gen; // And their dex ID number
     }
 
     public void getImage() {
+        // Grab image from PokeAPI, using a URL reader
         BufferedImage image = null;
         try {
-            URL url = new URL(String.format("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/%d.png", dex));
+            URL url = new URL(String.format("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/%d.png", dex)); // Format dex into here so that the appropriate Pokemon image is downloaded
             image = ImageIO.read(url);
             ImageIO.write(image, "png", new File("mon.png"));
 
         } catch(IOException e){
+            // If not connected to the internet, exit the program
             JOptionPane.showMessageDialog(null, "You don't appear to be connected to the Internet. \nPlease connect and try again later!", "No Internet Connection", JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         } 
     }
 
+    // Array with all Pokemon
     public final String[] POKEMON = {
         "Bulbasaur",
         "Ivysaur",
